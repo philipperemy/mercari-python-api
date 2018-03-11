@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class GMailSender:
     @staticmethod
-    def send_email_notification(gmail_user, email_content):
+    def send_email_notification(email_content):
         gmail_config_filename = 'gmail_conf.json'
         if os.path.isfile(gmail_config_filename):
             with open(gmail_config_filename, 'r') as gmail:
@@ -21,7 +21,6 @@ class GMailSender:
                 gmail_password = gmail_constants['gmail_password']
                 target_email = gmail_constants['target_email']
                 email_subject = gmail_constants['email_subject']
-
                 user = f'{gmail_user}@gmail.com'
                 p = postman(host='smtp.gmail.com', auth=(user, gmail_password))
                 r = p.send(email(content=email_content,
@@ -42,14 +41,16 @@ def monitor(keyword='bike'):
         logger.info(f'CURRENT = {item}.')
 
     while True:
+        logger.info('Fetching the first page to check new results.')
         items_on_first_page, _ = mercari.fetch_items_pagination(keyword=keyword, page_id=0)
         new_items = set(items_on_first_page) - set(persisted_items)
         for new_item in new_items:
             logger.info(f'NEW = {new_item}.')
-            GMailSender.send_email_notification()
-        sleep(60 * 10)  # 10 minutes.
+            GMailSender.send_email_notification(new_item)
+        sleep(60)  # 1 minute.
 
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - monitor - %(levelname)s - %(message)s', level=logging.INFO)
+    # GMailSender.send_email_notification('Hello.')
     monitor()
