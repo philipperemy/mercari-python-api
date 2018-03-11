@@ -11,12 +11,12 @@ A Python interface to the unofficial Mercari API.
 Documentation is as follows.
 
 - **```mercari.fetch_all_items(keyword='bike', price_max=None)```**
-  - `keyword`: The day on which to execute the query.
+  - `keyword`: Keyword search.
   - `price_max`: Maximum price in Yen.
   - `returns`: Returns a list of item urls.
   
 
 - **```mercari.get_item_info(item_url='https://item.mercari.com/jp/m72639077322/')```**
-  - `item_url`: The day on which to execute the query.
+  - `item_url`: The URL of the item. Returns from the `fetch_all_items` function.
   - `returns`: `Item` object (name, desc, price, is sold out...)
   
