@@ -100,7 +100,7 @@ def main():
     gmail = GMailSender()
     monitors = []
     for keyword in keywords:
-        monitors.append(MonitorKeyword(keyword, price_max, gmail))
+        monitors.append(MonitorKeyword(keyword.strip(), price_max, gmail))
     for monitor in monitors:
         monitor.start()
         sleep(5)  # delay the start between them.
