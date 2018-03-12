@@ -10,6 +10,8 @@ A Python interface to the unofficial Mercari API.
 
 Documentation is as follows.
 
+### Public endpoints
+
 - **```mercari.fetch_all_items(keyword='bike', price_max=None)```**
   - `keyword`: Keyword search.
   - `price_max`: Maximum price in Yen.
@@ -19,4 +21,19 @@ Documentation is as follows.
 - **```mercari.get_item_info(item_url='https://item.mercari.com/jp/m72639077322/')```**
   - `item_url`: The URL of the item. Returns from the `fetch_all_items` function.
   - `returns`: `Item` object (name, desc, price, is sold out...)
+
+### Private endpoints
+
+- Not implemented yet.
   
+## Installation
+
+Simply run:
+
+```
+git clone git@github.com:philipperemy/mercari-python-api.git
+cd mercari-python-api
+virtualenv -p python3.6 venv3.6
+pip install -r requirements.txt
+python setup.py install
+```
