@@ -52,7 +52,7 @@ def monitor(keyword='bike'):
             persisted_items.append(new_item)
             item = mercari.get_item_info(new_item)
             email_subject = f'{item.name} {item.price}'
-            email_content = f'{item.url}\n\n{item.desc}'
+            email_content = f'{item.url}<br/><br/>{item.desc}'
             attachment = item.local_url
             GMailSender.send_email_notification(email_subject, email_content, attachment)
         sleep(30)  # 30 seconds.
