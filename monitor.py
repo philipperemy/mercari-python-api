@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class GMailSender:
     @staticmethod
-    def send_email_notification(email_content):
+    def send_email_notification(email_subject, email_content, attachment):
         gmail_config_filename = 'gmail_conf.json'
         if os.path.isfile(gmail_config_filename):
             with open(gmail_config_filename, 'r') as gmail:
@@ -20,13 +20,16 @@ class GMailSender:
                 gmail_user = gmail_constants['gmail_user']
                 gmail_password = gmail_constants['gmail_password']
                 target_email = gmail_constants['target_email']
-                email_subject = gmail_constants['email_subject']
                 user = f'{gmail_user}@gmail.com'
                 p = postman(host='smtp.gmail.com', auth=(user, gmail_password))
                 r = p.send(email(content=email_content,
                                  subject=email_subject,
                                  sender='{0} <{0}>'.format(user),
-                                 receivers=[target_email]))
+                                 receivers=[target_email],
+                                 attachments=[attachment]))
+                logger.info(f'Email subject is {email_subject}.')
+                logger.info(f'Email content is {email_content}.')
+                logger.info(f'Attachment located at {attachment}.')
                 logger.info(f'Notification sent to {target_email}.')
                 assert r.ok
         else:
@@ -47,12 +50,14 @@ def monitor(keyword='bike'):
         for new_item in new_items:
             logger.info(f'NEW = {new_item}.')
             persisted_items.append(new_item)
-            mercari.get_item_info(new_item)
-            GMailSender.send_email_notification(new_item)
+            item = mercari.get_item_info(new_item)
+            email_subject = f'{item.name} {item.price}'
+            email_content = item.desc
+            attachment = item.local_url
+            GMailSender.send_email_notification(email_subject, email_content, attachment)
         sleep(30)  # 30 seconds.
 
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - monitor - %(levelname)s - %(message)s', level=logging.INFO)
-    # GMailSender.send_email_notification('Hello.')
     monitor()

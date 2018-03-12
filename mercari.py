@@ -1,20 +1,25 @@
 import logging
+import os
 import re
+import tempfile
 from time import sleep
 
 import requests
+import wget
 from bs4 import BeautifulSoup, NavigableString
 
 logger = logging.getLogger(__name__)
 
 
 class Item:
-    def __init__(self, name, price, desc, sold_out, photo):
+    def __init__(self, name, price, desc, sold_out, photo, url, local_url):
         self.name = name
         self.price = price
         self.desc = desc
         self.sold_out = sold_out
         self.photo = photo
+        self.url = url
+        self.local_url = local_url
 
     def print(self):
         logger.info(self.name)
@@ -22,6 +27,7 @@ class Item:
         logger.info(self.desc)
         logger.info(self.sold_out)
         logger.info(self.photo)
+        logger.info(self.url)
 
 
 def _get_mercari_jp_end_point(page=0, keyword='hibiki 17', price_max=None):
@@ -85,7 +91,13 @@ def get_item_info(item_url: str = 'https://item.mercari.com/jp/m72639077322/') -
     photo = soup.find('div', {'class': 'item-photo'})
     photo = photo.find('img').attrs['data-src']
 
-    item = Item(name=name, price=price, desc=desc, sold_out=sold_out, photo=photo)
+    temp_folder = os.path.join(tempfile.gettempdir(), 'mercari')
+    if not os.path.exists(temp_folder):
+        os.makedirs(temp_folder)
+
+    logger.info(f'Selected tmp folder = {temp_folder}.')
+    local_url = wget.download(url=photo, out=temp_folder, bar=None)
+    item = Item(name=name, price=price, desc=desc, sold_out=sold_out, photo=photo, url=item_url, local_url=local_url)
     return item
 
 
@@ -100,7 +112,7 @@ def _get_soup(url):
 
 
 def main():
-    fetch_all_items()
+    # fetch_all_items()
     item = get_item_info()
     item.print()
 
