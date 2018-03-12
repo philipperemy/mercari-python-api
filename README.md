@@ -20,3 +20,14 @@ Documentation is as follows.
   - `item_url`: The URL of the item. Returns from the `fetch_all_items` function.
   - `returns`: `Item` object (name, desc, price, is sold out...)
   
+## Installation
+
+Simply run:
+
+```
+git clone git@github.com:philipperemy/mercari-python-api.git
+cd mercari-python-api
+virtualenv -p python3.6 venv3.6
+pip install -r requirements.txt
+python setup.py install
+```
