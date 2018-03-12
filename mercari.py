@@ -34,14 +34,14 @@ def _get_mercari_jp_end_point(page=0, keyword='hibiki 17', price_max=None):
     return url
 
 
-def fetch_all_items(keyword='hibiki 17', price_max=None, max_items_to_fetch=None):
+def fetch_all_items(keyword: str = 'hibiki 17', price_max: int = None, max_items_to_fetch: int = None):
     items_list = []
     for page_id in range(int(1e9)):
         items, search_res_head_tag = fetch_items_pagination(keyword, page_id, price_max)
         items_list.extend(items)
         logger.info(f'Found {len(items_list)} items so far.')
 
-        if len(items_list) > max_items_to_fetch:
+        if max_items_to_fetch is not None and len(items_list) > max_items_to_fetch:
             logger.info(f'Reached the maximum items to fetch: {max_items_to_fetch}.')
             break
 
@@ -56,7 +56,7 @@ def fetch_all_items(keyword='hibiki 17', price_max=None, max_items_to_fetch=None
     return items_list
 
 
-def fetch_items_pagination(keyword, page_id, price_max=None):
+def fetch_items_pagination(keyword: str, page_id: int, price_max: int = None):
     soup = _get_soup(_get_mercari_jp_end_point(page_id, keyword, price_max=price_max))
     sleep(2)
     search_res_head_tag = soup.find('h2', {'class': 'search-result-head'})
@@ -66,7 +66,7 @@ def fetch_items_pagination(keyword, page_id, price_max=None):
 
 # https://item.mercari.com/jp/m72639077322/
 # https://item.mercari.com/jp/m47283125349/ SOLD
-def get_item_info(item_url='https://item.mercari.com/jp/m72639077322/'):
+def get_item_info(item_url: str = 'https://item.mercari.com/jp/m72639077322/') -> Item:
     soup = _get_soup(item_url)
     soup = soup.find('section', {'class': 'item-box-container'})
     price = str(soup.find('span', {'class': 'item-price bold'}).contents[0])
@@ -100,7 +100,7 @@ def _get_soup(url):
 
 
 def main():
-    # fetch_all_items()
+    fetch_all_items()
     item = get_item_info()
     item.print()
 

@@ -47,6 +47,7 @@ def monitor(keyword='bike'):
         for new_item in new_items:
             logger.info(f'NEW = {new_item}.')
             persisted_items.append(new_item)
+            mercari.get_item_info(new_item)
             GMailSender.send_email_notification(new_item)
         sleep(30)  # 30 seconds.
 
