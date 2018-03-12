@@ -58,7 +58,7 @@ class MonitorKeyword:
         self.keyword = keyword
         self.price_max = price_max
         self.gmail_sender = gmail_sender
-        self.thread = threading.Thread(target=self.task)
+        self.thread = threading.Thread(target=self.task, daemon=True)
 
     def join(self):
         self.thread.join()
