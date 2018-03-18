@@ -15,8 +15,9 @@ logger = logging.getLogger(__name__)
 def get_script_arguments():
     parser = argparse.ArgumentParser(description='Receive Gmail notifications every time new items matching '
                                                  'your request parameters are available.')
-    parser.add_argument('--keywords', required=True, type=str, help='Keywords separated by a comma (,).')
-    parser.add_argument('--price_max', type=str, help='Maximum price for each item.', default=None)
+    parser.add_argument('--keywords', required=True, type=str, help='Keywords separated by a comma.')
+    parser.add_argument('--max_prices', type=str, help='Maximum price for each item separated by a comma.',
+                        default=None)
     args = parser.parse_args()
     logger.info(args)
     return args
@@ -67,7 +68,7 @@ class MonitorKeyword:
         self.thread.start()
 
     def task(self):
-        logger.info(f'[{self.keyword}] Starting monitoring.')
+        logger.info(f'[{self.keyword}] Starting monitoring with price_max = {self.price_max}.')
         persisted_items = mercari.fetch_all_items(keyword=self.keyword,
                                                   price_max=self.price_max,
                                                   max_items_to_fetch=100)
@@ -96,11 +97,12 @@ def main():
     logging.basicConfig(format='%(asctime)s - monitor - %(levelname)s - %(message)s', level=logging.INFO)
     args = get_script_arguments()
     keywords = args.keywords.strip().split(',')
-    price_max = int(args.price_max) if args.price_max is not None else None
+    max_prices = args.max_prices.strip().split(',')
+    max_prices = [int(v) for v in max_prices]
     gmail = GMailSender()
     monitors = []
-    for keyword in keywords:
-        monitors.append(MonitorKeyword(keyword.strip(), price_max, gmail))
+    for keyword, max_price in zip(keywords, max_prices):
+        monitors.append(MonitorKeyword(keyword.strip(), max_price, gmail))
     for monitor in monitors:
         monitor.start()
         sleep(5)  # delay the start between them.
