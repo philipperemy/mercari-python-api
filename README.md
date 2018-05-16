@@ -37,3 +37,7 @@ virtualenv -p python3.6 venv3.6
 pip install -r requirements.txt
 python setup.py install
 ```
+
+## Important 
+
+Amazon AWS IPs are blacklisted by Mercari. So don't use AWS EC2 to run this script, it will not work.
