@@ -16,8 +16,10 @@ def get_script_arguments():
     parser = argparse.ArgumentParser(description='Receive Gmail notifications every time new items matching '
                                                  'your request parameters are available.')
     parser.add_argument('--keywords', required=True, type=str, help='Keywords separated by a comma.')
-    parser.add_argument('--max_prices', type=str, help='Maximum price for each item separated by a comma.')
-    parser.add_argument('--min_prices', type=str, help='Minimum price for each item separated by a comma.')
+    parser.add_argument('--max_prices', required=True, type=str,
+                        help='Maximum price for each item separated by a comma.')
+    parser.add_argument('--min_prices', required=True, type=str,
+                        help='Minimum price for each item separated by a comma.')
     args = parser.parse_args()
     logger.info(args)
     return args
