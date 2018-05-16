@@ -38,6 +38,15 @@ pip install -r requirements.txt
 python setup.py install
 ```
 
+## Monitoring
+
+```
+cp gmail_conf.json.example gmail_conf.json
+vim gmail_conf.json # edit this file.
+cd examples/
+python3.6 -u monitor.py --keywords "road bike, moto bike" --max_prices "43000,43000" --min_prices "0,0"
+```
+
 ## Important 
 
 Amazon AWS IPs are blacklisted by Mercari. So don't use AWS EC2 to run this script, it will not work.
