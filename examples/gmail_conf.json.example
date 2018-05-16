@@ -1,5 +1,6 @@
 {
   "gmail_user": "",
   "gmail_password": "",
-  "target_email": ""
+  "sender_email": "",
+  "recipients": "ilove@apple.com,john.doe@yahoo.com"
 }

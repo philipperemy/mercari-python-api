@@ -1,10 +1,10 @@
+from time import sleep
+
 import logging
 import os
 import re
-import tempfile
-from time import sleep
-
 import requests
+import tempfile
 import wget
 from bs4 import BeautifulSoup, NavigableString
 
@@ -30,20 +30,25 @@ class Item:
         logger.info(self.url)
 
 
-def _get_mercari_jp_end_point(page=0, keyword='hibiki 17', price_max=None):
+def _get_mercari_jp_end_point(page=0, keyword='hibiki 17', price_min=None, price_max=None):
     # https://www.mercari.com/jp/search/?page=200&keyword=%E9%9F%BF%EF%BC%91%EF%BC%97&sort_order=&price_max=10000
     url = f'https://www.mercari.com/jp/search/?page={page}'
     url += f'&keyword={keyword}'
     url += '&sort_order='
     if price_max is not None:
         url += f'&price_max={price_max}'
+    if price_min is not None:
+        url += f'&price_min={price_min}'
     return url
 
 
-def fetch_all_items(keyword: str = 'hibiki 17', price_max: int = None, max_items_to_fetch: int = None):
+def fetch_all_items(keyword: str = 'hibiki 17',
+                    price_min: int = None,
+                    price_max: int = None,
+                    max_items_to_fetch: int = None):
     items_list = []
     for page_id in range(int(1e9)):
-        items, search_res_head_tag = fetch_items_pagination(keyword, page_id, price_max)
+        items, search_res_head_tag = fetch_items_pagination(keyword, page_id, price_min, price_max)
         items_list.extend(items)
         logger.info(f'Found {len(items_list)} items so far.')
 
@@ -62,8 +67,8 @@ def fetch_all_items(keyword: str = 'hibiki 17', price_max: int = None, max_items
     return items_list
 
 
-def fetch_items_pagination(keyword: str, page_id: int, price_max: int = None):
-    soup = _get_soup(_get_mercari_jp_end_point(page_id, keyword, price_max=price_max))
+def fetch_items_pagination(keyword: str, page_id: int, price_min: int = None, price_max: int = None):
+    soup = _get_soup(_get_mercari_jp_end_point(page_id, keyword, price_min=price_min, price_max=price_max))
     sleep(2)
     search_res_head_tag = soup.find('h2', {'class': 'search-result-head'})
     items = [s.find('a').attrs['href'] for s in soup.find_all('section', {'class': 'items-box'})]
