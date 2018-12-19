@@ -30,7 +30,7 @@ Documentation is as follows.
 
 Simply run:
 
-```
+```bash
 git clone git@github.com:philipperemy/mercari-python-api.git
 cd mercari-python-api
 virtualenv -p python3.6 venv3.6
@@ -40,7 +40,7 @@ python setup.py install
 
 ## Monitoring
 
-```
+```bash
 cp gmail_conf.json.example gmail_conf.json
 vim gmail_conf.json # edit this file.
 cd examples/
