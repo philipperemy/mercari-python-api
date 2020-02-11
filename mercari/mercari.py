@@ -81,7 +81,7 @@ def get_item_info(item_url: str = 'https://item.mercari.com/jp/m72639077322/') -
     soup = _get_soup(item_url)
     soup = soup.find('section', {'class': 'item-box-container'})
     price = str(soup.find('span', {'class': 'item-price bold'}).contents[0])
-    name = str(soup.find('h2', {'class': 'item-name'}).contents[0])
+    name = str(soup.find('h1', {'class': 'item-name'}).contents[0])
 
     def filter_html_br(x):
         return isinstance(x, NavigableString)
