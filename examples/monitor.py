@@ -5,6 +5,7 @@ import os
 import threading
 from time import sleep
 
+import requests
 from mailthon import postman, email
 
 import mercari
@@ -25,8 +26,39 @@ def get_script_arguments():
     return args
 
 
+class Alertzy:
+
+    def __init__(self):
+        self.use_module = True
+        self.lock = threading.Lock()
+        config_filename = 'alertzy_conf.json'
+        if os.path.isfile(config_filename):
+            with open(config_filename, 'r') as r:
+                self.alertzy_key = json.load(r)['alertzy_key']
+        else:
+            self.use_module = False
+            logger.warning('Alertzy was not configured. Notifications will not be sent to your '
+                           'iPhone through the Alertzy app.')
+
+    def send_notification(self, message, title):
+        # https://alertzy.app/
+        if self.use_module:
+            with self.lock:
+                assert self.alertzy_key is not None
+                try:
+                    requests.post('https://alertzy.app/send', data={
+                        'accountKey': self.alertzy_key,
+                        'title': title,
+                        'message': message
+                    })
+                except Exception:
+                    return False
+                return True
+
+
 class GMailSender:
     def __init__(self):
+        self.use_module = True
         self.lock = threading.Lock()
         gmail_config_filename = 'gmail_conf.json'
         if os.path.isfile(gmail_config_filename):
@@ -39,33 +71,37 @@ class GMailSender:
                     exit(1)
                 self.recipients = [x.strip() for x in gmail_constants['recipients'].strip().split(',')]
         else:
-            logger.info('Gmail is not configured. If you want to receive email notifications, '
-                        'copy gmail_conf.json.example to gmail_conf.json and edit the constants. '
-                        'I advise you to create a new Gmail account, just for this purpose.')
+            self.use_module = False
+            logger.warning('Gmail is not configured. If you want to receive email notifications, '
+                           'copy gmail_conf.json.example to gmail_conf.json and edit the constants. '
+                           'I advise you to create a new Gmail account, just for this purpose.')
 
     def send_email_notification(self, email_subject, email_content, attachment):
-        with self.lock:
-            for recipient in self.recipients:
-                p = postman(host='smtp.gmail.com', auth=(self.gmail_user, self.gmail_password))
-                r = p.send(email(content=email_content,
-                                 subject=email_subject,
-                                 sender='{0} <{0}>'.format(self.gmail_user),
-                                 receivers=[recipient],
-                                 attachments=[attachment]))
-                logger.info(f'Email subject is {email_subject}.')
-                logger.info(f'Email content is {email_content}.')
-                logger.info(f'Attachment located at {attachment}.')
-                logger.info(f'Notification sent from {self.gmail_user}.')
-                logger.info(f'Notification sent to {recipient}.')
-                assert r.ok
+        if self.use_module:
+            with self.lock:
+                for recipient in self.recipients:
+                    p = postman(host='smtp.gmail.com', auth=(self.gmail_user, self.gmail_password))
+                    r = p.send(email(content=email_content,
+                                     subject=email_subject,
+                                     sender='{0} <{0}>'.format(self.gmail_user),
+                                     receivers=[recipient],
+                                     attachments=[attachment]))
+                    logger.info(f'Email subject is {email_subject}.')
+                    logger.info(f'Email content is {email_content}.')
+                    logger.info(f'Attachment located at {attachment}.')
+                    logger.info(f'Notification sent from {self.gmail_user}.')
+                    logger.info(f'Notification sent to {recipient}.')
+                    assert r.ok
 
 
 class MonitorKeyword:
-    def __init__(self, keyword: str, price_min: int, price_max: int, gmail_sender: GMailSender):
+    def __init__(self, keyword: str, price_min: int, price_max: int,
+                 gmail_sender: GMailSender, alertzy: Alertzy):
         self.keyword = keyword
         self.price_min = price_min
         self.price_max = price_max
         self.gmail_sender = gmail_sender
+        self.alertzy = alertzy
         self.thread = threading.Thread(target=self.task, daemon=True)
 
     def join(self):
@@ -103,6 +139,8 @@ class MonitorKeyword:
                 email_subject = f'{item.name} {item.price}'
                 email_content = f'{item.url}<br/><br/>{item.desc}'
                 attachment = item.local_url
+                if self.alertzy is not None:
+                    self.alertzy.send_notification(email_subject, title=self.keyword)
                 if self.gmail_sender is not None:
                     self.gmail_sender.send_email_notification(email_subject, email_content, attachment)
 
@@ -114,9 +152,10 @@ def main():
     max_prices = [int(v) for v in args.max_prices.strip().split(',')]
     min_prices = [int(v) for v in args.min_prices.strip().split(',')]
     gmail = GMailSender()
+    alertzy = Alertzy()
     monitors = []
     for keyword, min_price, max_price in zip(keywords, min_prices, max_prices):
-        monitors.append(MonitorKeyword(keyword.strip(), min_price, max_price, gmail))
+        monitors.append(MonitorKeyword(keyword.strip(), min_price, max_price, gmail, alertzy))
     for monitor in monitors:
         monitor.start()
         sleep(5)  # delay the start between them.
