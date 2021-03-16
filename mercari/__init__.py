@@ -1,1 +1,0 @@
-from mercari.mercari import *
