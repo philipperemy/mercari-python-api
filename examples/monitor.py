@@ -78,16 +78,20 @@ class GMailSender:
                            'copy gmail_conf.json.example to gmail_conf.json and edit the constants. '
                            'I advise you to create a new Gmail account, just for this purpose.')
 
-    def send_email_notification(self, email_subject, email_content, attachment):
+    def send_email_notification(self, email_subject, email_content, attachment=None):
         if self.use_module:
             with self.lock:
+                if attachment is not None:
+                    attachment = [attachment]
+                else:
+                    attachment = ()
                 for recipient in self.recipients:
                     p = postman(host='smtp.gmail.com', auth=(self.gmail_user, self.gmail_password))
                     r = p.send(email(content=email_content,
                                      subject=email_subject,
                                      sender='{0} <{0}>'.format(self.gmail_user),
                                      receivers=[recipient],
-                                     attachments=[attachment]))
+                                     attachments=attachment))
                     logger.info(f'Email subject is {email_subject}.')
                     logger.info(f'Email content is {email_content}.')
                     logger.info(f'Attachment located at {attachment}.')
