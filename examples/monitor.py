@@ -196,6 +196,8 @@ def main():
     keywords = args.keywords.strip().split(',')
     max_prices = [int(v) for v in args.max_prices.strip().split(',')]
     min_prices = [int(v) for v in args.min_prices.strip().split(',')]
+    assert len(min_prices) == len(max_prices)
+    assert all([m1 < m2 for m1, m2 in zip(min_prices, max_prices)])
     gmail = None if args.disable_gmail else GMailSender()
     alertzy = None if args.disable_alertzy else Alertzy()
     monitors = []
