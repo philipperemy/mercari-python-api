@@ -1,5 +1,5 @@
 {
-  "gmail_user": "",
-  "gmail_password": "",
-  "recipients": "ilove@apple.com,john.doe@yahoo.com"
+  "gmail_user": "my_gmail_user@gmail.com",
+  "gmail_password": "my_gmail_password",
+  "recipients": "i_will_receive_the_notification@apple.com,me_too@yahoo.com"
 }
