@@ -42,8 +42,9 @@ pip install -e .
 
 ```bash
 cd examples
-cp gmail_conf.json.example gmail_conf.json
-vim gmail_conf.json # edit this file.
+# edit one of those two files to receive notifications.
+cp gmail_conf.json.example gmail_conf.json # edit this file.
+cp alertzy_conf.json.example alertzy_conf.json # edit this file.
 python monitor.py --keywords "road bike, moto bike" --max_prices "43000,43000" --min_prices "0,0"
 ```
 
