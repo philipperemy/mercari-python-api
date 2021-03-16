@@ -1,10 +1,10 @@
-from time import sleep
-
 import argparse
 import json
 import logging
 import os
 import threading
+from time import sleep
+
 from mailthon import postman, email
 
 import mercari
@@ -32,9 +32,11 @@ class GMailSender:
         if os.path.isfile(gmail_config_filename):
             with open(gmail_config_filename, 'r') as gmail:
                 gmail_constants = json.load(gmail)
-                self.gmail_user = gmail_constants['gmail_user']
                 self.gmail_password = gmail_constants['gmail_password']
-                self.sender_email = gmail_constants['sender_email']
+                self.gmail_user = gmail_constants['gmail_user']
+                if '@' not in self.gmail_user:
+                    logger.error('Gmail user should be a GMAIL address.')
+                    exit(1)
                 self.recipients = [x.strip() for x in gmail_constants['recipients'].strip().split(',')]
         else:
             logger.info('Gmail is not configured. If you want to receive email notifications, '
@@ -44,16 +46,16 @@ class GMailSender:
     def send_email_notification(self, email_subject, email_content, attachment):
         with self.lock:
             for recipient in self.recipients:
-                p = postman(host='smtp.gmail.com', auth=(self.sender_email, self.gmail_password))
+                p = postman(host='smtp.gmail.com', auth=(self.gmail_user, self.gmail_password))
                 r = p.send(email(content=email_content,
                                  subject=email_subject,
-                                 sender='{0} <{0}>'.format(self.sender_email),
+                                 sender='{0} <{0}>'.format(self.gmail_user),
                                  receivers=[recipient],
                                  attachments=[attachment]))
                 logger.info(f'Email subject is {email_subject}.')
                 logger.info(f'Email content is {email_content}.')
                 logger.info(f'Attachment located at {attachment}.')
-                logger.info(f'Notification sent from {self.sender_email}.')
+                logger.info(f'Notification sent from {self.gmail_user}.')
                 logger.info(f'Notification sent to {recipient}.')
                 assert r.ok
 
@@ -75,22 +77,27 @@ class MonitorKeyword:
     def task(self):
         logger.info(f'[{self.keyword}] Starting monitoring with price_max = {self.price_max} '
                     f'and price_min = {self.price_min}.')
-        persisted_items = mercari.fetch_all_items(keyword=self.keyword,
-                                                  price_min=self.price_min,
-                                                  price_max=self.price_max,
-                                                  max_items_to_fetch=100)
-        for item in persisted_items:
-            logger.info(f'[{self.keyword}] CURRENT = {item}.')
+        persisted_items = mercari.fetch_all_items(
+            keyword=self.keyword,
+            price_min=self.price_min,
+            price_max=self.price_max,
+            max_items_to_fetch=100
+        )
+        logger.info(f'We found {len(persisted_items)} items.')
+        logger.info('The program has started to monitor for new items...')
 
         while True:
+            sleep(30)
             logger.info(f'[{self.keyword}] Fetching the first page to check new results.')
-            items_on_first_page, _ = mercari.fetch_items_pagination(keyword=self.keyword,
-                                                                    page_id=0,
-                                                                    price_min=self.price_min,
-                                                                    price_max=self.price_max)
+            items_on_first_page, _ = mercari.fetch_items_pagination(
+                keyword=self.keyword,
+                page_id=0,
+                price_min=self.price_min,
+                price_max=self.price_max
+            )
             new_items = set(items_on_first_page) - set(persisted_items)
             for new_item in new_items:
-                logger.info(f'[{self.keyword}] NEW = {new_item}.')
+                logger.info(f'[{self.keyword}] New item detected: {new_item}.')
                 persisted_items.append(new_item)
                 item = mercari.get_item_info(new_item)
                 email_subject = f'{item.name} {item.price}'
@@ -98,7 +105,6 @@ class MonitorKeyword:
                 attachment = item.local_url
                 if self.gmail_sender is not None:
                     self.gmail_sender.send_email_notification(email_subject, email_content, attachment)
-            sleep(30)
 
 
 def main():
