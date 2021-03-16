@@ -163,8 +163,8 @@ class MonitorKeyword:
                     logger.info('Will skip GMAIL.')
 
     def _run(self):
-        logger.info(f'[{self.keyword}] Starting monitoring with price_max = {self.price_max} '
-                    f'and price_min = {self.price_min}.')
+        logger.info(f'[{self.keyword}] Starting monitoring with price_max: {self.price_max} '
+                    f'and price_min: {self.price_min}.')
         self.scrape_outstanding_items()
         time_between_two_requests = 30
         logger.info(f'We will check the first page(s) every {time_between_two_requests} seconds '
