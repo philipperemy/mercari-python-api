@@ -9,7 +9,8 @@ from typing import Union
 import requests
 from mailthon import postman, email
 
-import mercari
+from mercari.mercari import Mercari
+from mercari.rakuma import Rakuma
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,8 @@ def get_script_arguments():
                         help='Maximum price for each item separated by a comma.')
     parser.add_argument('--min_prices', required=True, type=str,
                         help='Minimum price for each item separated by a comma.')
+    parser.add_argument('--disable_alertzy', action='store_true')
+    parser.add_argument('--disable_gmail', action='store_true')
     args = parser.parse_args()
     logger.info(args)
     return args
@@ -109,41 +112,41 @@ class MonitorKeyword:
         self.price_max = price_max
         self.gmail_sender = gmail_sender
         self.alertzy = alertzy
-        self.thread = threading.Thread(target=self.task, daemon=True)
+        self.thread = threading.Thread(target=self._run, daemon=True)
+        self.mercari = Mercari()
+        self.rakuma = Rakuma()
+        self.persisted_items = []
 
     def join(self):
         self.thread.join()
 
-    def start(self):
+    def start_monitoring(self):
         self.thread.start()
 
-    def task(self):
-        logger.info(f'[{self.keyword}] Starting monitoring with price_max = {self.price_max} '
-                    f'and price_min = {self.price_min}.')
-        persisted_items = mercari.fetch_all_items(
-            keyword=self.keyword,
-            price_min=self.price_min,
-            price_max=self.price_max,
-            max_items_to_fetch=100
-        )
-        logger.info(f'We found {len(persisted_items)} items.')
-        time_between_two_requests = 30
-        logger.info(f'We will check the first page every {time_between_two_requests} seconds and look for new items.')
-        logger.info('The program has started to monitor for new items...')
-
-        while True:
-            sleep(time_between_two_requests)
-            items_on_first_page, _ = mercari.fetch_items_pagination(
+    def scrape_outstanding_items(self):
+        for backend in [self.mercari, self.rakuma]:
+            items = backend.fetch_all_items(
                 keyword=self.keyword,
-                page_id=0,
+                price_min=self.price_min,
+                price_max=self.price_max,
+                max_items_to_fetch=100
+            )
+            self.persisted_items.extend(items)
+            logger.info(f'{len(items)} items found for {backend.name()}.')
+        logger.info(f'{len(self.persisted_items)} items found in total.')
+
+    def check_for_new_items(self):
+        for backend in [self.mercari, self.rakuma]:
+            items_on_first_page, _ = backend.fetch_items_pagination(
+                keyword=self.keyword,
                 price_min=self.price_min,
                 price_max=self.price_max
             )
-            new_items = set(items_on_first_page) - set(persisted_items)
+            new_items = set(items_on_first_page) - set(self.persisted_items)
             for new_item in new_items:
                 logger.info(f'[{self.keyword}] New item detected: {new_item}.')
-                persisted_items.append(new_item)
-                item = mercari.get_item_info(new_item)
+                self.persisted_items.append(new_item)
+                item = backend.get_item_info(new_item)
                 email_subject = f'{item.name} {item.price}'
                 email_subject_with_url = f'{email_subject} {item.url}'
                 email_content = f'{item.url}<br/><br/>{item.desc}'
@@ -158,6 +161,18 @@ class MonitorKeyword:
                     self.gmail_sender.send_email_notification(email_subject, email_content, attachment)
                 else:
                     logger.info('Will skip GMAIL.')
+
+    def _run(self):
+        logger.info(f'[{self.keyword}] Starting monitoring with price_max = {self.price_max} '
+                    f'and price_min = {self.price_min}.')
+        self.scrape_outstanding_items()
+        time_between_two_requests = 30
+        logger.info(f'We will check the first page(s) every {time_between_two_requests} seconds '
+                    f'and look for new items.')
+        logger.info('The program has started to monitor for new items...')
+        while True:
+            sleep(time_between_two_requests)
+            self.check_for_new_items()
 
 
 def init_logging():
@@ -181,14 +196,15 @@ def main():
     keywords = args.keywords.strip().split(',')
     max_prices = [int(v) for v in args.max_prices.strip().split(',')]
     min_prices = [int(v) for v in args.min_prices.strip().split(',')]
-    gmail = GMailSender()
-    alertzy = Alertzy()
+    gmail = None if args.disable_gmail else GMailSender()
+    alertzy = None if args.disable_alertzy else Alertzy()
     monitors = []
     for keyword, min_price, max_price in zip(keywords, min_prices, max_prices):
         monitors.append(MonitorKeyword(keyword.strip(), min_price, max_price, gmail, alertzy))
     for monitor in monitors:
-        monitor.start()
+        monitor.start_monitoring()
         sleep(5)  # delay the start between them.
+    # wait forever.
     for monitor in monitors:
         monitor.join()
 

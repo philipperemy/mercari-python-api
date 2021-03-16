@@ -3,7 +3,7 @@ from time import sleep
 from typing import Union, List, Any
 from urllib.parse import urlencode
 
-from common import Common, Item, _get_soup
+from mercari.common import Common, Item, _get_soup
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class Rakuma(Common):
     def fetch_items_pagination(
             self,
             keyword: str,
-            page_id: int,
+            page_id: int = 1,
             price_min: int = None,
             price_max: int = None
     ) -> Union[List[str], Any]:
@@ -47,8 +47,8 @@ class Rakuma(Common):
     ) -> Item:
         soup = _get_soup(item_url)
 
-        def fetch_meta(name):
-            return soup.find('meta', {'property': name}).attrs['content']
+        def fetch_meta(n):
+            return soup.find('meta', {'property': n}).attrs['content']
 
         name = fetch_meta('og:title')
         if '|' in name:
@@ -81,6 +81,9 @@ class Rakuma(Common):
             params.update({'page': page})
         url = 'https://fril.jp/s?' + urlencode(params)
         return url
+
+    def name(self) -> str:
+        return 'rakuma'
 
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ from typing import List, Any, Union
 # noinspection PyProtectedMember
 from bs4 import NavigableString
 
-from common import Item, Common, _get_soup
+from mercari.common import Item, Common, _get_soup
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ class Mercari(Common):
     def fetch_items_pagination(
             self,
             keyword: str,
-            page_id: int,
+            page_id: int = 0,
             price_min: int = None,
             price_max: int = None
     ) -> Union[List[str], Any]:  # List of URLS and a HTML marker.
@@ -52,7 +52,6 @@ class Mercari(Common):
         search_res_head_tag = soup.find('h2', {'class': 'search-result-head'})
         items = [s.find('a').attrs['href'] for s in soup.find_all('section', {'class': 'items-box'})]
         items = [it if it.startswith('http') else 'https://www.mercari.com' + it for it in items]
-        # /jp/items/m88046246209/
         return items, search_res_head_tag
 
     def get_item_info(
@@ -87,9 +86,6 @@ class Mercari(Common):
             price_min: Union[None, int] = None,
             price_max: Union[None, int] = None
     ):
-        # https://fril.jp/s?max=30000&min=10000&order=desc&page=2&query=clothes&sort=relevance
-        # https://www.mercari.com/jp/search/?page=200&keyword=%E9%9F%BF%EF%BC%91%EF%BC%97&sort_order=&price_max=10000
-        # https://www.mercari.com/jp/search/?page=200&keyword=%E9%9F%BF%EF%BC%91%EF%BC%97&sort_order=&price_max=10000
         url = f'https://www.mercari.com/jp/search/?page={page}'
         url += f'&keyword={keyword}'
         url += '&sort_order='
@@ -98,3 +94,6 @@ class Mercari(Common):
         if price_min is not None:
             url += f'&price_min={price_min}'
         return url
+
+    def name(self) -> str:
+        return 'mercari'

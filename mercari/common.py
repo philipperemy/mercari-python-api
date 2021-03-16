@@ -33,10 +33,10 @@ class Common:
 
     def fetch_all_items(
             self,
-            keyword: str = 'bicycle',
-            price_min: int = None,
-            price_max: int = None,
-            max_items_to_fetch: int = None
+            keyword: str,
+            price_min: int,
+            price_max: int,
+            max_items_to_fetch: int
     ) -> List[str]:  # list of URLs.
         pass
 
@@ -44,8 +44,8 @@ class Common:
             self,
             keyword: str,
             page_id: int,
-            price_min: int = None,
-            price_max: int = None
+            price_min: int,
+            price_max: int
     ) -> Union[List[str], Any]:  # List of URLS and a HTML marker.
         pass
 
@@ -57,18 +57,21 @@ class Common:
 
     def fetch_url(
             self,
-            page: int = 0,
-            keyword: str = 'bicycle',
-            price_min: Union[None, int] = None,
-            price_max: Union[None, int] = None
+            page: int,
+            keyword: str,
+            price_min: Union[None, int],
+            price_max: Union[None, int]
     ) -> str:
         # https://fril.jp/s?max=30000&min=10000&order=desc&page=2&query=clothes&sort=relevance
         # https://www.mercari.com/jp/search/?page=200&keyword=%E9%9F%BF%EF%BC%91%EF%BC%97&sort_order=&price_max=10000
         pass
 
+    def name(self) -> str:
+        pass
 
-def _get_soup(url):
-    logger.debug(f'GET: {url}')
+
+def _get_soup(url: str) -> BeautifulSoup:
+    logger.info(f'GET: {url}')
     headers = {'User-Agent': "'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 "
                              "(KHTML, like Gecko) Chrome/29.0.1547.62 Safari/537.36'"}
     response = requests.get(url, headers=headers, timeout=20)
