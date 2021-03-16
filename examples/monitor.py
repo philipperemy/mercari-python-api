@@ -139,21 +139,32 @@ class MonitorKeyword:
                 persisted_items.append(new_item)
                 item = mercari.get_item_info(new_item)
                 email_subject = f'{item.name} {item.price}'
+                email_subject_with_url = f'{email_subject} {item.url}'
                 email_content = f'{item.url}<br/><br/>{item.desc}'
                 attachment = item.local_url
                 if self.alertzy is not None:
-                    self.alertzy.send_notification(email_subject, title=self.keyword)
+                    self.alertzy.send_notification(email_subject_with_url, title=self.keyword)
                 if self.gmail_sender is not None:
                     self.gmail_sender.send_email_notification(email_subject, email_content, attachment)
 
 
-def main():
-    print('Logging to monitor.log.')
+def init_logging():
+    format_str = '%(asctime)s - %(levelname)s - %(message)s'
+    formatter = logging.Formatter(format_str)
+    log_filename = 'monitor.log'
+    print(f'Logging to [{log_filename}].')
     logging.basicConfig(
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        level=logging.INFO,
-        filename='monitor.log'
+        format=format_str,
+        filename=log_filename,
+        level=logging.INFO
     )
+    console = logging.StreamHandler()
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
+
+
+def main():
+    init_logging()
     args = get_script_arguments()
     keywords = args.keywords.strip().split(',')
     max_prices = [int(v) for v in args.max_prices.strip().split(',')]

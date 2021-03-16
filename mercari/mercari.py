@@ -53,10 +53,10 @@ def fetch_all_items(
     for page_id in range(int(1e9)):
         items, search_res_head_tag = fetch_items_pagination(keyword, page_id, price_min, price_max)
         items_list.extend(items)
-        logger.info(f'Found {len(items_list)} items so far.')
+        logger.debug(f'Found {len(items_list)} items so far.')
 
         if max_items_to_fetch is not None and len(items_list) > max_items_to_fetch:
-            logger.info(f'Reached the maximum items to fetch: {max_items_to_fetch}.')
+            logger.debug(f'Reached the maximum items to fetch: {max_items_to_fetch}.')
             break
 
         if search_res_head_tag is None:
@@ -66,7 +66,7 @@ def fetch_all_items(
             num_items = re.findall('\d+', search_res_head)
             if len(num_items) == 1 and num_items[0] == '0':
                 break
-    logger.info('No more items to fetch.')
+    logger.debug('No more items to fetch.')
     return items_list
 
 
