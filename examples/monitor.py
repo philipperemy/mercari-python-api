@@ -35,6 +35,7 @@ class Alertzy:
         if os.path.isfile(config_filename):
             with open(config_filename, 'r') as r:
                 self.alertzy_key = json.load(r)['alertzy_key']
+            self.send_notification('Monitoring has started.', title='Mercari')
         else:
             self.use_module = False
             logger.warning('Alertzy was not configured. Notifications will not be sent to your '
@@ -120,11 +121,12 @@ class MonitorKeyword:
             max_items_to_fetch=100
         )
         logger.info(f'We found {len(persisted_items)} items.')
+        time_between_two_requests = 30
+        logger.info(f'We will check the first page every {time_between_two_requests} seconds and look for new items.')
         logger.info('The program has started to monitor for new items...')
 
         while True:
-            sleep(30)
-            logger.info(f'[{self.keyword}] Fetching the first page to check new results.')
+            sleep(time_between_two_requests)
             items_on_first_page, _ = mercari.fetch_items_pagination(
                 keyword=self.keyword,
                 page_id=0,
@@ -146,7 +148,12 @@ class MonitorKeyword:
 
 
 def main():
-    logging.basicConfig(format='%(asctime)s - monitor - %(levelname)s - %(message)s', level=logging.INFO)
+    print('Logging to monitor.log.')
+    logging.basicConfig(
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        level=logging.INFO,
+        filename='monitor.log'
+    )
     args = get_script_arguments()
     keywords = args.keywords.strip().split(',')
     max_prices = [int(v) for v in args.max_prices.strip().split(',')]

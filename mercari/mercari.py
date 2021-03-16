@@ -1,10 +1,11 @@
-from time import sleep
-
 import logging
 import os
 import re
-import requests
 import tempfile
+from time import sleep
+from typing import List, Any, Union
+
+import requests
 import wget
 from bs4 import BeautifulSoup, NavigableString
 
@@ -42,10 +43,12 @@ def _get_mercari_jp_end_point(page=0, keyword='hibiki 17', price_min=None, price
     return url
 
 
-def fetch_all_items(keyword: str = 'hibiki 17',
-                    price_min: int = None,
-                    price_max: int = None,
-                    max_items_to_fetch: int = None):
+def fetch_all_items(
+        keyword: str = 'hibiki 17',
+        price_min: int = None,
+        price_max: int = None,
+        max_items_to_fetch: int = None
+) -> List[str]:  # list of URLs.
     items_list = []
     for page_id in range(int(1e9)):
         items, search_res_head_tag = fetch_items_pagination(keyword, page_id, price_min, price_max)
@@ -67,17 +70,24 @@ def fetch_all_items(keyword: str = 'hibiki 17',
     return items_list
 
 
-def fetch_items_pagination(keyword: str, page_id: int, price_min: int = None, price_max: int = None):
+def fetch_items_pagination(
+        keyword: str,
+        page_id: int,
+        price_min: int = None,
+        price_max: int = None
+) -> Union[List[str], Any]:  # List of URLS and a HTML marker.
     soup = _get_soup(_get_mercari_jp_end_point(page_id, keyword, price_min=price_min, price_max=price_max))
     sleep(2)
     search_res_head_tag = soup.find('h2', {'class': 'search-result-head'})
     items = [s.find('a').attrs['href'] for s in soup.find_all('section', {'class': 'items-box'})]
+    items = [it if it.startswith('http') else 'https://www.mercari.com' + it for it in items]
+    # /jp/items/m88046246209/
     return items, search_res_head_tag
 
 
-# https://item.mercari.com/jp/m72639077322/
-# https://item.mercari.com/jp/m47283125349/ SOLD
-def get_item_info(item_url: str = 'https://item.mercari.com/jp/m72639077322/') -> Item:
+def get_item_info(
+        item_url: str = 'https://www.mercari.com/jp/items/m53585037017/'
+) -> Item:
     soup = _get_soup(item_url)
     soup = soup.find('section', {'class': 'item-box-container'})
     price = str(soup.find('span', {'class': 'item-price bold'}).contents[0])
@@ -100,7 +110,7 @@ def get_item_info(item_url: str = 'https://item.mercari.com/jp/m72639077322/') -
     if not os.path.exists(temp_folder):
         os.makedirs(temp_folder)
 
-    logger.info(f'Selected tmp folder = {temp_folder}.')
+    logger.debug(f'Selected tmp folder: {temp_folder}.')
     local_url = wget.download(url=photo, out=temp_folder, bar=None)
     item = Item(name=name, price=price, desc=desc, sold_out=sold_out, photo=photo, url=item_url, local_url=local_url)
     return item
