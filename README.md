@@ -33,9 +33,9 @@ Simply run:
 ```bash
 git clone git@github.com:philipperemy/mercari-python-api.git
 cd mercari-python-api
-virtualenv -p python3.6 venv3.6
+virtualenv -p python3 venv && source venv/bin/activate
 pip install -r requirements.txt
-python setup.py install
+pip install -e .
 ```
 
 ## Monitoring
@@ -44,8 +44,7 @@ python setup.py install
 cd examples
 cp gmail_conf.json.example gmail_conf.json
 vim gmail_conf.json # edit this file.
-cd examples/
-python3.6 -u monitor.py --keywords "road bike, moto bike" --max_prices "43000,43000" --min_prices "0,0"
+python -u monitor.py --keywords "road bike, moto bike" --max_prices "43000,43000" --min_prices "0,0"
 ```
 
 ## Important 
