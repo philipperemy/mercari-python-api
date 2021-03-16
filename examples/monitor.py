@@ -175,8 +175,7 @@ def main():
     keywords = args.keywords.strip().split(',')
     max_prices = [int(v) for v in args.max_prices.strip().split(',')]
     min_prices = [int(v) for v in args.min_prices.strip().split(',')]
-    # gmail = GMailSender()
-    gmail = None
+    gmail = GMailSender()
     alertzy = Alertzy()
     monitors = []
     for keyword, min_price, max_price in zip(keywords, min_prices, max_prices):
