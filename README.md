@@ -44,7 +44,7 @@ pip install -e .
 cd examples
 cp gmail_conf.json.example gmail_conf.json
 vim gmail_conf.json # edit this file.
-python -u monitor.py --keywords "road bike, moto bike" --max_prices "43000,43000" --min_prices "0,0"
+python monitor.py --keywords "road bike, moto bike" --max_prices "43000,43000" --min_prices "0,0"
 ```
 
 ## Important 
