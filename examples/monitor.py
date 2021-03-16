@@ -4,6 +4,7 @@ import logging
 import os
 import threading
 from time import sleep
+from typing import Union
 
 import requests
 from mailthon import postman, email
@@ -97,7 +98,8 @@ class GMailSender:
 
 class MonitorKeyword:
     def __init__(self, keyword: str, price_min: int, price_max: int,
-                 gmail_sender: GMailSender, alertzy: Alertzy):
+                 gmail_sender: Union[None, GMailSender],
+                 alertzy: Union[None, Alertzy]):
         self.keyword = keyword
         self.price_min = price_min
         self.price_max = price_max
@@ -169,7 +171,8 @@ def main():
     keywords = args.keywords.strip().split(',')
     max_prices = [int(v) for v in args.max_prices.strip().split(',')]
     min_prices = [int(v) for v in args.min_prices.strip().split(',')]
-    gmail = GMailSender()
+    # gmail = GMailSender()
+    gmail = None
     alertzy = Alertzy()
     monitors = []
     for keyword, min_price, max_price in zip(keywords, min_prices, max_prices):
