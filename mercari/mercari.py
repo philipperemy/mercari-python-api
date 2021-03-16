@@ -117,7 +117,7 @@ def get_item_info(
 
 
 def _get_soup(url):
-    logger.info(f'GET: {url}')
+    logger.debug(f'GET: {url}')
     headers = {'User-Agent': "'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 "
                              "(KHTML, like Gecko) Chrome/29.0.1547.62 Safari/537.36'"}
     response = requests.get(url, headers=headers, timeout=20)
