@@ -41,6 +41,7 @@ python setup.py install
 ## Monitoring
 
 ```bash
+cd examples
 cp gmail_conf.json.example gmail_conf.json
 vim gmail_conf.json # edit this file.
 cd examples/
