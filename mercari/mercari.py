@@ -60,7 +60,7 @@ class Mercari(Common):
     ) -> Item:
         soup = _get_soup(item_url)
         soup = soup.find('section', {'class': 'item-box-container'})
-        price = str(soup.find('span', {'class': 'item-price bold'}).contents[0])
+        price = str(soup.find('span', {'class': 'item-price bold'}).contents[0]).replace('¥', '').replace(',', '')
         name = str(soup.find('h1', {'class': 'item-name'}).contents[0])
 
         def filter_html_br(x):
