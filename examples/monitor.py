@@ -149,9 +149,15 @@ class MonitorKeyword:
                 email_content = f'{item.url}<br/><br/>{item.desc}'
                 attachment = item.local_url
                 if self.alertzy is not None:
+                    logger.info('Will send an Alertzy notification.')
                     self.alertzy.send_notification(email_subject_with_url, title=self.keyword)
+                else:
+                    logger.info('Will skip Alertzy.')
                 if self.gmail_sender is not None:
+                    logger.info('Will send a GMAIL notification.')
                     self.gmail_sender.send_email_notification(email_subject, email_content, attachment)
+                else:
+                    logger.info('Will skip GMAIL.')
 
 
 def init_logging():
