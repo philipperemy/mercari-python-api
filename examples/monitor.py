@@ -72,6 +72,7 @@ class GMailSender:
                     logger.error('Gmail user should be a GMAIL address.')
                     exit(1)
                 self.recipients = [x.strip() for x in gmail_constants['recipients'].strip().split(',')]
+            self.send_email_notification('mercari', 'Monitoring has started')
         else:
             self.use_module = False
             logger.warning('Gmail is not configured. If you want to receive email notifications, '

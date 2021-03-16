@@ -127,7 +127,6 @@ def _get_soup(url):
 
 
 def main():
-    # fetch_all_items()
     item = get_item_info()
     item.print()
 
