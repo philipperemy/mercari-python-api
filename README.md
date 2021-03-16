@@ -40,6 +40,8 @@ pip install -e .
 
 ## Monitoring
 
+NOTE: For GMAIL notifications, you need to toggle ON the less secured apps here: https://myaccount.google.com/lesssecureapps.
+
 ```bash
 cd examples
 # edit one of those two files to receive notifications.
