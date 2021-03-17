@@ -38,9 +38,7 @@ pip install mercari_python
 From the sources
 
 ```bash
-git clone git@github.com:philipperemy/mercari-python-api.git && cd mercari-python-api
-virtualenv -p python3 venv && source venv/bin/activate
-pip install -e .
+pip install git+ssh://git.github.com/philipperemy/mercari-python-api
 ```
 
 ## Monitoring
