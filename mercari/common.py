@@ -33,8 +33,8 @@ class Item:
         self.local_url = _download_photo(self.url_photo)
 
     def __str__(self) -> str:
-        return f'name={self.name}, price={self.price}, desc={self.desc}, sold_out={self.sold_out},' \
-               f'url_photo={self.url_photo}, url={self.url}, local_url={self.local_url}'
+        return f'(name={self.name}, price={self.price}, desc={self.desc.strip()}, sold_out={self.sold_out},' \
+               f'url_photo={self.url_photo}, url={self.url}, local_url={self.local_url})'
 
 
 class Common:
@@ -44,7 +44,7 @@ class Common:
             keyword: str,
             price_min: Union[None, int],
             price_max: Union[None, int],
-            max_items_to_fetch: Union[None, int]
+            max_items_to_fetch: Union[None, int] = 100
     ) -> List[str]:  # list of URLs.
         """
         :rtype: A list of URL (Strings).
@@ -81,7 +81,7 @@ class Common:
         """
         pass
 
-    def fetch_url(
+    def _fetch_url(
             self,
             page: int,
             keyword: str,
@@ -92,8 +92,9 @@ class Common:
         # https://www.mercari.com/jp/search/?page=200&keyword=%E9%9F%BF%EF%BC%91%EF%BC%97&sort_order=&price_max=10000
         pass
 
+    @property
     def name(self) -> str:
-        pass
+        return 'common'
 
 
 def _get_soup(url: str) -> BeautifulSoup:

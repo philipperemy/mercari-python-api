@@ -9,8 +9,8 @@ from typing import Union
 import requests
 from mailthon import postman, email
 
-from mercari.mercari import Mercari
-from mercari.rakuma import Rakuma
+from mercari import Mercari
+from mercari import Rakuma
 
 logger = logging.getLogger(__name__)
 
@@ -132,7 +132,7 @@ class MonitorKeyword:
                 max_items_to_fetch=100
             )
             self.persisted_items.extend(items)
-            logger.info(f'{len(items)} items found for {backend.name()}.')
+            logger.info(f'{len(items)} items found for {backend.name}.')
         logger.info(f'{len(self.persisted_items)} items found in total.')
 
     def check_for_new_items(self):

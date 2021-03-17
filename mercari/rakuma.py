@@ -16,7 +16,7 @@ class Rakuma(Common):
             keyword: str = 'bicycle',
             price_min: Union[None, int] = None,
             price_max: Union[None, int] = None,
-            max_items_to_fetch: Union[None, int] = None
+            max_items_to_fetch: Union[None, int] = 100
     ) -> List[str]:
         items_list = []
         for page_id in range(1, int(1e9)):  # rakuma starts at page 1.
@@ -37,7 +37,7 @@ class Rakuma(Common):
             price_min: Union[None, int] = None,
             price_max: Union[None, int] = None
     ) -> Union[List[str], Any]:
-        soup = _get_soup(self.fetch_url(page_id, keyword, price_min=price_min, price_max=price_max))
+        soup = _get_soup(self._fetch_url(page_id, keyword, price_min=price_min, price_max=price_max))
         items = [item.a.attrs['href'] for item in soup.find_all('div', {'class': 'item-box__image-wrapper'})]
         return items, None
 
@@ -64,7 +64,7 @@ class Rakuma(Common):
 
         return item
 
-    def fetch_url(
+    def _fetch_url(
             self,
             page: int = 0,
             keyword: str = 'bicycle',
@@ -82,6 +82,7 @@ class Rakuma(Common):
         url = 'https://fril.jp/s?' + urlencode(params)
         return url
 
+    @property
     def name(self) -> str:
         return 'rakuma'
 

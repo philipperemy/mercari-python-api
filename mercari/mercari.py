@@ -18,7 +18,7 @@ class Mercari(Common):
             keyword: str = 'clothes',
             price_min: Union[None, int] = None,
             price_max: Union[None, int] = None,
-            max_items_to_fetch: Union[None, int] = None
+            max_items_to_fetch: Union[None, int] = 100
     ) -> List[str]:  # list of URLs.
         items_list = []
         for page_id in range(int(1e9)):
@@ -48,7 +48,7 @@ class Mercari(Common):
             price_min: Union[None, int] = None,
             price_max: Union[None, int] = None
     ) -> Union[List[str], Any]:  # List of URLS and a HTML marker.
-        soup = _get_soup(self.fetch_url(page_id, keyword, price_min=price_min, price_max=price_max))
+        soup = _get_soup(self._fetch_url(page_id, keyword, price_min=price_min, price_max=price_max))
         search_res_head_tag = soup.find('h2', {'class': 'search-result-head'})
         items = [s.find('a').attrs['href'] for s in soup.find_all('section', {'class': 'items-box'})]
         items = [it if it.startswith('http') else 'https://www.mercari.com' + it for it in items]
@@ -79,7 +79,7 @@ class Mercari(Common):
         item = Item(name=name, price=price, desc=desc, sold_out=sold_out, url_photo=photo, url=item_url)
         return item
 
-    def fetch_url(
+    def _fetch_url(
             self,
             page: int = 0,
             keyword: str = 'bicycle',
@@ -95,5 +95,6 @@ class Mercari(Common):
             url += f'&price_min={price_min}'
         return url
 
+    @property
     def name(self) -> str:
         return 'mercari'
