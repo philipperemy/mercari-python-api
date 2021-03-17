@@ -16,9 +16,9 @@ class Mercari(Common):
     def fetch_all_items(
             self,
             keyword: str = 'clothes',
-            price_min: int = None,
-            price_max: int = None,
-            max_items_to_fetch: int = None
+            price_min: Union[None, int] = None,
+            price_max: Union[None, int] = None,
+            max_items_to_fetch: Union[None, int] = None
     ) -> List[str]:  # list of URLs.
         items_list = []
         for page_id in range(int(1e9)):
@@ -45,8 +45,8 @@ class Mercari(Common):
             self,
             keyword: str,
             page_id: int = 0,
-            price_min: int = None,
-            price_max: int = None
+            price_min: Union[None, int] = None,
+            price_max: Union[None, int] = None
     ) -> Union[List[str], Any]:  # List of URLS and a HTML marker.
         soup = _get_soup(self.fetch_url(page_id, keyword, price_min=price_min, price_max=price_max))
         search_res_head_tag = soup.find('h2', {'class': 'search-result-head'})

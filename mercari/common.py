@@ -16,6 +16,14 @@ class Item:
     def __init__(self,
                  name: str, price: Union[int, str], desc: str,
                  sold_out: bool, url_photo: str, url: str):
+        """
+        :param name: Name of the item (String).
+        :param price: Price (Integer)
+        :param desc: Description of the item (String).
+        :param sold_out: If the item was sold (Boolean).
+        :param url_photo: URL to the photo (String).
+        :param url: Local path to the downloaded photo (String).
+        """
         self.name = name
         self.price = int(price)
         self.desc = desc
@@ -34,25 +42,43 @@ class Common:
     def fetch_all_items(
             self,
             keyword: str,
-            price_min: int,
-            price_max: int,
-            max_items_to_fetch: int
+            price_min: Union[None, int],
+            price_max: Union[None, int],
+            max_items_to_fetch: Union[None, int]
     ) -> List[str]:  # list of URLs.
+        """
+        :rtype: A list of URL (Strings).
+        :param keyword: Keyword for the search (required).
+        :param price_min: Minimum price in yen (optional).
+        :param price_max: Maximum price in yen (optional).
+        :param max_items_to_fetch: Maximum number of items to return (optional).
+        """
         pass
 
     def fetch_items_pagination(
             self,
             keyword: str,
             page_id: int,
-            price_min: int,
-            price_max: int
+            price_min: Union[None, int],
+            price_max: Union[None, int]
     ) -> Union[List[str], Any]:  # List of URLS and a HTML marker.
+        """
+        :param keyword: Keyword for the search (required).
+        :param page_id: The page id for the pagination (e.g. 0, 1, 2...)
+        :param price_min: Minimum price in yen (optional).
+        :param price_max: Maximum price in yen (optional).
+        :rtype: List of URLS and a HTML marker.
+        """
         pass
 
     def get_item_info(
             self,
             item_url: str
     ) -> Item:
+        """
+        :param item_url: The URL of the item to fetch.
+        :rtype: Item: The Item object.
+        """
         pass
 
     def fetch_url(
