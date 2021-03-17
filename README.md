@@ -53,6 +53,4 @@ cp alertzy_conf.json.example alertzy_conf.json # edit this file.
 python monitor.py --keywords "road bike,moto bike" --min_prices "0,0" --max_prices "43000,43000"
 ```
 
-## Important 
-
-Amazon AWS IPs are blacklisted by Mercari. So don't use AWS EC2 to run this script, it will not work.
+Note: Amazon AWS IPs are blacklisted by Mercari. So don't use AWS EC2 to run this script, it will not work.
