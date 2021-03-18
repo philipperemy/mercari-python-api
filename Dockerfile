@@ -4,7 +4,7 @@ MAINTAINER Philippe Remy <premy.enseirb@gmail.com>
 # https://stackoverflow.com/questions/36710459/how-do-i-make-a-comment-in-a-dockerfile
 ARG DEBIAN_FRONTEND=noninteractive
 
-COPY examples /app/
+COPY . /app/
 
 WORKDIR /app
 
