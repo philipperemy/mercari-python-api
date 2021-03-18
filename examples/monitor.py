@@ -172,7 +172,10 @@ class MonitorKeyword:
         logger.info('The program has started to monitor for new items...')
         while True:
             sleep(time_between_two_requests)
-            self.check_for_new_items()
+            try:
+                self.check_for_new_items()
+            except ConnectionError:
+                logger.exception('exception')
 
 
 def init_logging():

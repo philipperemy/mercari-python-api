@@ -104,7 +104,7 @@ def _get_soup(url: str) -> BeautifulSoup:
     response = requests.get(url, headers=headers, timeout=20)
     if response.status_code != 200:
         logger.error(response)
-        raise AssertionError()
+        raise ConnectionError()
     soup = BeautifulSoup(response.content, 'lxml')
     return soup
 
