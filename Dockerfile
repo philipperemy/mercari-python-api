@@ -8,6 +8,7 @@ COPY . /app/
 
 WORKDIR /app
 
+RUN pip3 install --upgrade pip
 RUN pip3 install -e .
 
 WORKDIR /app/examples
