@@ -13,6 +13,4 @@ RUN pip3 install -e .
 
 WORKDIR /app/examples
 
-ENTRYPOINT [ "python3" ]
-
-CMD [ "monitor.py" ]
+ENTRYPOINT [ "python3", "monitor.py" ]
