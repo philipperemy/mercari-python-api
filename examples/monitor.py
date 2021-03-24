@@ -162,6 +162,7 @@ class MonitorKeyword:
                 else:
                     logger.info('Will skip GMAIL.')
 
+    # noinspection PyBroadException
     def _run(self):
         logger.info(f'[{self.keyword}] Starting monitoring with price_max: {self.price_max} '
                     f'and price_min: {self.price_min}.')
@@ -174,8 +175,9 @@ class MonitorKeyword:
             sleep(time_between_two_requests)
             try:
                 self.check_for_new_items()
-            except ConnectionError:
+            except Exception:
                 logger.exception('exception')
+                sleep(30)
 
 
 def init_logging():
