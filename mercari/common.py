@@ -39,7 +39,8 @@ class Item:
         self.local_url = _download_photo(self.url_photo)
 
     def __str__(self) -> str:
-        return f'(name={self.name}, price={self.price}, desc={self.desc.strip()}, in_stock={self.in_stock},' \
+        return f'(name={self.name}, price={self.price}, condition={self.condition}, is_new={self.is_new}, ' \
+            f'in_stock={self.in_stock}, desc={self.desc.strip()},' \
             f'url_photo={self.url_photo}, url={self.url}, local_url={self.local_url})'
 
 

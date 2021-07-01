@@ -55,7 +55,11 @@ class Mercari(Common):
         name = str(soup.find('meta', {'property': 'og:title'})["content"])
         desc = soup.find('meta', {'property': 'og:description'})["content"]
         condition = soup.find('meta', {'itemprop': 'itemCondition'})["content"]  # TODO: Filter to Like new
-        is_new = True if soup.find('span', class_=lambda t: t and "Blue" in t, text='News') else False
+        new_label =soup.find('span', class_=lambda t: t and "Blue" in t, text='New')
+        recently_edited = soup.find('p', class_=lambda c: c and "Text__T4" in c,
+                                    text=lambda t: 'minute' in t)
+        is_new = True if new_label and recently_edited else False
+        # TODO Add Tags: Tags__TagLink
         in_stock = True if soup.find('meta', {'property': 'og:availability'}, content='instock') else False
 
         photo = str(soup.find('meta', {'property': 'og:image'})["content"])
@@ -78,7 +82,7 @@ class Mercari(Common):
             url += f'&price_max={price_max}'
         if price_min is not None:
             url += f'&price_min={price_min}'
-        logging.debug(url)
+        # logging.debug(url)
         return url
 
     @property

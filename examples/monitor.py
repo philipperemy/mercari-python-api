@@ -138,13 +138,13 @@ class MonitorKeyword:
             price_min=self.price_min,
             price_max=self.price_max
         )
-        new_items = [fp_item for fp_item in items_on_first_page if fp_item.url
-                     not in set([item.url for item in self.persisted_items])]
+        new_items = set(items_on_first_page) - set(self.persisted_items)
         for new_item in new_items:
-            logging.info(f'[{self.keyword}] New item detected: {new_item}.')
+            logging.debug(f'[{self.keyword}] New Url: {new_item}.')
             self.persisted_items.append(new_item)
             item = self.mercari.get_item_info(new_item)
             if self.keyword.lower() in item.name.lower() and item.is_new and item.in_stock:
+                logging.info(f'[{self.keyword}] New item detected: {new_item}.')
                 email_subject = f'{item.name} {item.price}'
                 email_subject_with_url = f'{email_subject} {item.url}'
                 email_content = f'{item.url}<br/><br/>{item.desc}'
@@ -182,7 +182,7 @@ class MonitorKeyword:
 
 
 def main():
-    logging.set_verbosity(logging.INFO)
+    logging.set_verbosity(logging.DEBUG)
     args = get_script_arguments()
     keywords = args.keywords.strip().split(',')
     max_prices = [int(v) for v in args.max_prices.strip().split(',')]
