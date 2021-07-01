@@ -8,33 +8,39 @@ import requests
 import wget
 from bs4 import BeautifulSoup
 
-logger = logging.getLogger(__name__)
-
 
 class Item:
 
     def __init__(self,
-                 name: str, price: Union[int, str], desc: str,
-                 sold_out: bool, url_photo: str, url: str):
+                 name: str,
+                 price: float,
+                 desc: str,
+                 condition: str,
+                 is_new: bool,
+                 in_stock: bool,
+                 url_photo: str,
+                 url: str):
         """
         :param name: Name of the item (String).
         :param price: Price (Integer)
         :param desc: Description of the item (String).
-        :param sold_out: If the item was sold (Boolean).
+        :param in_stock: If the item is in stock (Boolean).
         :param url_photo: URL to the photo (String).
         :param url: Local path to the downloaded photo (String).
         """
         self.name = name
-        self.price = int(price)
+        self.price = price
         self.desc = desc
-        self.sold_out = sold_out
+        self.condition = condition
+        self.is_new = is_new
+        self.in_stock = in_stock
         self.url_photo = url_photo
         self.url = url
         self.local_url = _download_photo(self.url_photo)
 
     def __str__(self) -> str:
-        return f'(name={self.name}, price={self.price}, desc={self.desc.strip()}, sold_out={self.sold_out},' \
-               f'url_photo={self.url_photo}, url={self.url}, local_url={self.local_url})'
+        return f'(name={self.name}, price={self.price}, desc={self.desc.strip()}, in_stock={self.in_stock},' \
+            f'url_photo={self.url_photo}, url={self.url}, local_url={self.local_url})'
 
 
 class Common:
@@ -98,12 +104,12 @@ class Common:
 
 
 def _get_soup(url: str) -> BeautifulSoup:
-    logger.info(f'GET: {url}')
+    logging.info(f'GET: {url}')
     headers = {'User-Agent': "'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 "
                              "(KHTML, like Gecko) Chrome/29.0.1547.62 Safari/537.36'"}
     response = requests.get(url, headers=headers, timeout=20)
     if response.status_code != 200:
-        logger.error(response)
+        logging.error(response)
         raise ConnectionError()
     soup = BeautifulSoup(response.content, 'lxml')
     return soup
@@ -117,7 +123,7 @@ def _download_photo(url_photo: str, temp_dir: Union[None, str] = None):
     if not temp_dir.exists():
         temp_dir.mkdir(parents=True, exist_ok=True)
 
-    logger.debug(f'Selected tmp folder: {temp_dir}.')
+    logging.debug(f'Selected tmp folder: {temp_dir}.')
     remote_filename = Path(urlparse(url_photo).path).name
     wget.download(url=url_photo, out=str(temp_dir), bar=None)
     local_url = str(temp_dir / remote_filename)
