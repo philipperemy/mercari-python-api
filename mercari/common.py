@@ -107,7 +107,8 @@ class Common:
 def _get_soup(url: str) -> BeautifulSoup:
     logging.info(f'GET: {url}')
     headers = {'User-Agent': "'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 "
-                             "(KHTML, like Gecko) Chrome/29.0.1547.62 Safari/537.36'"}
+                             "(KHTML, like Gecko) Chrome/29.0.1547.62 Safari/537.36'",
+               'Cache-Control': 'no-cache'}
     response = requests.get(url, headers=headers, timeout=20)
     if response.status_code != 200:
         logging.error(response)

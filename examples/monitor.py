@@ -126,7 +126,7 @@ class MonitorKeyword:
             keyword=self.keyword,
             price_min=self.price_min,
             price_max=self.price_max,
-            max_items_to_fetch=200
+            max_items_to_fetch=100
         )
         self.persisted_items.extend(items)
         logging.info(f'{len(items)} items found for {self.mercari.name}.')
@@ -168,7 +168,7 @@ class MonitorKeyword:
         logging.info(f'[{self.keyword}] Starting monitoring with price_max: {self.price_max} '
                      f'and price_min: {self.price_min}.')
         self.scrape_outstanding_items()
-        time_between_two_requests = 30
+        time_between_two_requests = 60
         logging.info(f'We will check the first page(s) every {time_between_two_requests} seconds '
                      f'and look for new items.')
         logging.info('The program has started to monitor for new items...')
