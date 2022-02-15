@@ -24,7 +24,7 @@ print(mercari_api.get_item_info('https://www.mercari.com/jp/items/m88046246209/'
 print('_' * 80)
 print(rakuma_api.name)
 print(rakuma_api.fetch_all_items(keyword='CHANEL')[0:10])
-print(rakuma_api.get_item_info('https://item.fril.jp/e0c79971ed2b15e083428d93803e78f0'))
+print(rakuma_api.get_item_info('https://item.fril.jp/9093de55f88bc28d47c35fd1d4dd23f0'))
 ```
   
 ## Installation
